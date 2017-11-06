@@ -1,0 +1,21 @@
+{
+  "name": "web-socket",
+  "version": "1.0.0",
+  "description": "Node websocket with typescript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./dist/server/server.js"
+  },
+  "author": "Tom J",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.0.39",
+    "@types/ws": "^3.2.0",
+    "typescript": "^2.6.1"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "ws": "^3.2.0"
+  }
+}
