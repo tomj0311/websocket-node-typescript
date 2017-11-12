@@ -3,6 +3,8 @@ import * as http from 'http';
 import * as webSocket from 'ws';
 
 import * as models from './dataModel';
+import { json } from 'body-parser';
+import { clearInterval } from 'timers';
 
 export interface ResponseData {
 	DateTime: Date;
@@ -16,32 +18,35 @@ const server = http.createServer(app);
 const wss = new webSocket.Server({ server});
 
 wss.on('connection', (ws: webSocket) => {
+    var interval = setInterval(function() {
+        //
+    }, 1000);
 
     ws.on('message', (message: string) => {
-		try {
-            let userMessage: models.RequestMessage = new models.RequestMessage(message);
-            
-            let resdata: ResponseData[] = [];
-            
-            let fromdate = new Date(userMessage.FromDate);
-            let todate = new Date(userMessage.ToDate);
-    
-            while(fromdate < todate){
-                var randomnumber =  Math.floor(Math.random() * userMessage.Randomize) + 1
-                resdata.push({DateTime: fromdate, Randomized: randomnumber});
-                 
-                fromdate =  new Date(fromdate.setSeconds(fromdate.getSeconds() + 1));
+        
+        clearInterval(interval);
+
+        let datamodel: models.DataModel = new models.DataModel(message);
+
+        let fdate = new Date(datamodel.FromDate);
+        let tdate = new Date(datamodel.ToDate);
+
+        interval = setInterval(function() {
+            fdate  =  new Date(fdate.setSeconds(fdate.getSeconds() + 1));
+            if (fdate >= tdate){
+                clearInterval(interval);
             }
-
-            let response = JSON.stringify(resdata);
-            ws.send(response);
-
-		} catch (e) {
-			console.error(e.message);
-		}
+            var randomnumber =  Math.floor(Math.random() * datamodel.Randomize) + 1;
+            sendData(JSON.stringify({DateTime: fdate.toString(), Randomized: randomnumber }));
+        }, 1000);
 	});
-    ws.send('Socket Ready');
 });
+
+function sendData(data: string) {
+    wss.clients.forEach(client => {
+        client.send(data);
+    });	
+}
 
 server.listen(process.env.PORT || 8999, () => {
     console.log(`Server started on port ${server.address().port} :)`);

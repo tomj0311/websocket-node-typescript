@@ -6,7 +6,7 @@ interface RequestData {
 	Randomize: number;
 }
 
-export class RequestMessage implements RequestData {
+export class DataModel implements RequestData {
 
 	private data: { FromDate: string; ToDate: string; Randomize: number };
 

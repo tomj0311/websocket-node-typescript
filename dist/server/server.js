@@ -4,30 +4,34 @@ const express = require("express");
 const http = require("http");
 const webSocket = require("ws");
 const models = require("./dataModel");
+const timers_1 = require("timers");
 const app = express();
 const server = http.createServer(app);
 const wss = new webSocket.Server({ server });
 wss.on('connection', (ws) => {
+    var interval = setInterval(function () {
+        //
+    }, 1000);
     ws.on('message', (message) => {
-        try {
-            let userMessage = new models.RequestMessage(message);
-            let resdata = [];
-            let fromdate = new Date(userMessage.FromDate);
-            let todate = new Date(userMessage.ToDate);
-            while (fromdate < todate) {
-                var randomnumber = Math.floor(Math.random() * userMessage.Randomize) + 1;
-                resdata.push({ DateTime: fromdate, Randomized: randomnumber });
-                fromdate = new Date(fromdate.setSeconds(fromdate.getSeconds() + 1));
+        timers_1.clearInterval(interval);
+        let datamodel = new models.DataModel(message);
+        let fdate = new Date(datamodel.FromDate);
+        let tdate = new Date(datamodel.ToDate);
+        interval = setInterval(function () {
+            fdate = new Date(fdate.setSeconds(fdate.getSeconds() + 1));
+            if (fdate >= tdate) {
+                timers_1.clearInterval(interval);
             }
-            let response = JSON.stringify(resdata);
-            ws.send(response);
-        }
-        catch (e) {
-            console.error(e.message);
-        }
+            var randomnumber = Math.floor(Math.random() * datamodel.Randomize) + 1;
+            sendData(JSON.stringify({ DateTime: fdate.toString(), Randomized: randomnumber }));
+        }, 1000);
     });
-    ws.send('Socket Ready');
 });
+function sendData(data) {
+    wss.clients.forEach(client => {
+        client.send(data);
+    });
+}
 server.listen(process.env.PORT || 8999, () => {
     console.log(`Server started on port ${server.address().port} :)`);
 });

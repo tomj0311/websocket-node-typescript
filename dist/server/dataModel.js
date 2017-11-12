@@ -1,6 +1,6 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
-class RequestMessage {
+class DataModel {
     constructor(payload) {
         let data = JSON.parse(payload);
         if (!data.FromDate || !data.ToDate || !data.Randomize) {
@@ -19,5 +19,5 @@ class RequestMessage {
         return this.data.Randomize;
     }
 }
-exports.RequestMessage = RequestMessage;
+exports.DataModel = DataModel;
 //# sourceMappingURL=dataModel.js.map
