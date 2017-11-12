@@ -5,11 +5,12 @@ interface RequestData {
 	ToDate: string;
 	Randomize: number;
 	Interval: number;
+	Message: string;
 }
 
 export class DataModel implements RequestData {
 
-	private data: { FromDate: string; ToDate: string; Randomize: number; Interval: number };
+	private data: { FromDate: string; ToDate: string; Randomize: number; Interval: number, Message: string;};
 
 	constructor(payload: string) {
 		let data = JSON.parse(payload);
@@ -36,5 +37,9 @@ export class DataModel implements RequestData {
 
 	get Interval(): number {
 		return this.data.Interval;
+	}
+
+	get Message(): string {
+		return this.data.Message;
 	}
 }
